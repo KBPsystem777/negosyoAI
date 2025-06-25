@@ -909,15 +909,15 @@ export default function PlannerPage() {
                 <Download className="w-4 h-4 mr-2" />
                 Download Complete Report
               </Button>
-              <Button
+              {/* <Button
                 disabled
                 className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700"
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 Start AI Coaching (Coming Soon!)
-              </Button>
-              <Link href="/dashboard">
-                <Button variant="outline">Back to Dashboard</Button>
+              </Button> */}
+              <Link href="/">
+                <Button variant="outline">Back to Home</Button>
               </Link>
             </div>
           </div>

@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
 
   // Protect dashboard and planner routes
   if (
-    request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/planner") ||
     request.nextUrl.pathname.startsWith("/planner")
   ) {
     const {
@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/planner", request.url));
     }
   }
 

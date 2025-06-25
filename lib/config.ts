@@ -76,7 +76,7 @@ export const siteConfig = {
       title: "AI Business Coaching",
       description:
         "24/7 AI coach providing personalized guidance, tips, and solutions for your business journey.",
-      color: "bg-gradient-to-r from-teal-500 to-cyan-500",
+      color: "bg-gradient-to-r from-blue-600 to-blue-500",
       benefits: [
         "Personalized coaching sessions",
         "Problem-solving assistance",
@@ -89,7 +89,7 @@ export const siteConfig = {
       title: "Investment Area Suggestions",
       description:
         "Smart recommendations on where to allocate your capital for maximum impact and returns.",
-      color: "bg-gradient-to-r from-amber-500 to-yellow-500",
+      color: "bg-gradient-to-r from-orange-500 to-orange-500",
       benefits: [
         "Equipment vs inventory allocation",
         "Marketing budget optimization",

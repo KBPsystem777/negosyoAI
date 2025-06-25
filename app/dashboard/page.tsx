@@ -3,29 +3,34 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Plus,
   FileText,
-  TrendingUp,
-  DollarSign,
   Calendar,
   Download,
   Edit,
   Trash2,
   LogOut,
   User,
+  BarChart3,
 } from "lucide-react";
+
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
 import { createClient } from "@/lib/supabase/client";
+import { trackingService } from "@/lib/tracking";
+
 import { FB_PAGE_URL, CONTACT_FORM } from "@/constants";
 
 export default function Dashboard() {
   const [user, setUser] = useState<{} | null>(null);
   const [businessPlans, setBusinessPlans] = useState([]);
+  const [userStats, setUserStats] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
@@ -45,6 +50,9 @@ export default function Dashboard() {
       // Track user activity
 
       await trackUserActivity(user.id, "dashboard_visit");
+
+      // Load user's business plans and statistics
+      await Promise.all([loadBusinessPlans(user.id), loadUserStats(user.id)]);
 
       // Load user's business plans
       await loadBusinessPlans(user.id);
@@ -100,6 +108,55 @@ export default function Dashboard() {
       setBusinessPlans(data || []);
     } catch (error) {
       console.error("Error loading business plans:", error);
+    }
+  };
+
+  const loadUserStats = async (userId: string) => {
+    try {
+      const stats = await trackingService.getUserStats(userId);
+      setUserStats(stats);
+    } catch (error) {
+      console.error("Error loading user stats:", error);
+    }
+  };
+
+  const handleDownload = async (businessPlan: any, reportType: string) => {
+    try {
+      // Track download before initiating
+      await trackingService.trackDownload({
+        userId: user.id,
+        businessPlanId: businessPlan.id,
+        downloadType: "txt", // You can make this dynamic
+      });
+
+      // Proceed with download
+      const response = await fetch("/api/download-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessPlan: businessPlan.recommendations?.[0] || businessPlan,
+          reportType,
+          businessPlanId: businessPlan.id,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to download report");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${reportType}-${businessPlan.business_name}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      // Refresh stats after download
+      await loadUserStats(user.id);
+    } catch (error) {
+      console.error("Error downloading report:", error);
+      alert("Failed to download report. Please try again.");
     }
   };
 
@@ -211,7 +268,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Business Plans</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {businessPlans.length}
+                    {userStats?.total_plans_generated || businessPlans.length}
                   </p>
                 </div>
                 <FileText className="w-8 h-8 text-blue-500" />
@@ -223,10 +280,14 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Beta Status</p>
-                  <p className="text-lg font-bold text-green-600">Active</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Total Generations
+                  </p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {userStats?.total_generations || 0}
+                  </p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-green-500" />
+                <BarChart3 className="w-8 h-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
@@ -235,14 +296,12 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    AI Recommendations
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {businessPlans.length * 3}
+                  <p className="text-sm text-gray-600 mb-1">Downloads</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {userStats?.total_downloads || 0}
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-purple-500" />
+                <Download className="w-8 h-8 text-purple-500" />
               </div>
             </CardContent>
           </Card>
@@ -355,6 +414,50 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Usage Statistics Card */}
+        {userStats && (
+          <Card className="mt-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Your Usage Statistics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-600">
+                    {userStats.total_plans_generated || 0}
+                  </p>
+                  <p className="text-sm text-gray-600">Plans Generated</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">
+                    {userStats.total_generations || 0}
+                  </p>
+                  <p className="text-sm text-gray-600">Total Generations</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-600">
+                    {userStats.total_downloads || 0}
+                  </p>
+                  <p className="text-sm text-gray-600">Downloads</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-orange-600">
+                    {userStats.last_generation_at
+                      ? new Date(
+                          userStats.last_generation_at
+                        ).toLocaleDateString()
+                      : "Never"}
+                  </p>
+                  <p className="text-sm text-gray-600">Last Generation</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Beta Feedback Card */}
         <Card className="mt-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg border-0">
