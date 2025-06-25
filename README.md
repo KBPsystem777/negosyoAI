@@ -74,7 +74,7 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## Contacts
 
-- Koleen Paunon - https://koleenbp.com
+- Koleen Paunon - https://linktr.ee/koleenbp
 - BPxAI - bpxailabs@gmail.com
 
 ## License
