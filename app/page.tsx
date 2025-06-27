@@ -67,9 +67,9 @@ export default function LandingPage() {
               </a>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/auth">
+              <Link href="/planner">
                 <Button className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700">
-                  Sign up for free!
+                  Try it now!
                 </Button>
               </Link>
             </div>
@@ -101,12 +101,12 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link href="/auth">
+            <Link href="/planner">
               <Button
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-lg px-8 py-4"
               >
-                Get me my FREE business idea
+                Try our AI Planner now!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>

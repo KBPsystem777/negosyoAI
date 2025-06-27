@@ -33,18 +33,19 @@ export async function middleware(request: NextRequest) {
   await supabase.auth.getUser();
 
   // Protect dashboard and planner routes
-  if (
-    request.nextUrl.pathname.startsWith("/planner") ||
-    request.nextUrl.pathname.startsWith("/planner")
-  ) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  // @note Turning off planner auth and protection for now
+  // if (
+  //   request.nextUrl.pathname.startsWith("/planner") ||
+  //   request.nextUrl.pathname.startsWith("/planner")
+  // ) {
+  //   const {
+  //     data: { user },
+  //   } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.redirect(new URL("/auth", request.url));
-    }
-  }
+  //   if (!user) {
+  //     return NextResponse.redirect(new URL("/auth", request.url));
+  //   }
+  // }
 
   // Redirect authenticated users away from auth page (but not callback)
   if (
