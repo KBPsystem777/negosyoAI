@@ -16,6 +16,8 @@ import {
 
 import Link from "next/link";
 
+import { useGAEvents } from "@/hooks/useGAEvents";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,6 +105,13 @@ export default function PlannerPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
+  const {
+    trackGenerateIdeaClick,
+    trackIdeaGenerated,
+    trackPlanDownload,
+    trackPageScrolledToBottom,
+  } = useGAEvents();
+
   const sortedProvinces = provinces.sort((a, b) =>
     a.name.localeCompare(b.name)
   );
@@ -112,6 +121,18 @@ export default function PlannerPage() {
   };
 
   const generateBusinessMatch = async () => {
+    const analyticsData = {
+      capital: formData.capital,
+      experience: formData.experience,
+      location: formData.location,
+      age: formData.age,
+      interests: formData.interests,
+      goals: formData.goals,
+    };
+
+    // Record the generate idea click event
+    trackGenerateIdeaClick(analyticsData);
+
     if (!formData.capital || !formData.experience || !formData.location) {
       alert("Please fill in all required fields");
       return;
@@ -130,6 +151,9 @@ export default function PlannerPage() {
       const match = await response.json();
       setBusinessMatch(match);
       setActiveTab("overview");
+
+      // Record the idea generated event
+      trackIdeaGenerated(match);
     } catch (error) {
       console.error("Error generating business match:", error);
       alert("Failed to generate business recommendations. Please try again.");
@@ -299,6 +323,8 @@ export default function PlannerPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      trackPlanDownload({ dateDownloaded: new Date().toISOString() });
     } catch (error) {
       console.error("Error downloading report:", error);
       alert("Failed to download report. Please try again.");

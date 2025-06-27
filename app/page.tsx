@@ -15,6 +15,9 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
+
+import { useGAEvents } from "@/hooks/useGAEvents";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +34,35 @@ import {
 } from "@/constants";
 
 export default function LandingPage() {
+  const { trackPageScrolledToBottom } = useGAEvents();
+  const footerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            trackPageScrolledToBottom();
+            // Disconnect observer after first trigger to avoid multiple calls
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of footer is visible
+      }
+    );
+
+    observer.observe(footer);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [trackPageScrolledToBottom]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-cyan-50">
       {/* Navigation */}
@@ -458,7 +490,11 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-gray-900 text-white py-16">
+      <footer
+        ref={footerRef}
+        id="contact"
+        className="bg-gray-900 text-white py-16"
+      >
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">

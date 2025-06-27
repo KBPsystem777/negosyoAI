@@ -7,6 +7,22 @@ import {
   BookOpen,
 } from "lucide-react";
 
+export const negosyoAIConfig = {
+  title: "negosyo.ai - AI-Powered Business Planning for Filipino Entrepreneurs",
+  description:
+    "Transform your business ideas into reality with AI-powered business plans, marketing strategies, and step-by-step coaching for Filipino micro-entrepreneurs.",
+  keywords:
+    "business planning, Filipino entrepreneurs, AI business plan, micro-business, startup Philippines",
+  authors: [{ name: "BPxAI" }],
+  openGraph: {
+    title: "negosyo.ai - AI Business Planning Platform",
+    description:
+      "Get personalized business plans and coaching for your Filipino micro-enterprise",
+    type: "website",
+  },
+  generator: "BPxAI",
+};
+
 export const siteConfig = {
   header: {
     title: "negosyo.ai - AI Business Matching Platform 🇵🇭",
