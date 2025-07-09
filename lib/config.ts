@@ -19,6 +19,22 @@ export const negosyoAIConfig = {
     description:
       "Get personalized business plans and coaching for your Filipino micro-enterprise",
     type: "website",
+    images: [
+      {
+        url: "/negosyoAI.png",
+        width: 1200,
+        height: 630,
+        alt: "negosyoAI Logo",
+      },
+    ],
+    siteName: "negosyoAI",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "negosyoAI",
+    description: "AI-Powered Business Planning for Filipino Entrepreneurs",
+    creator: "@bpxai",
+    images: "/negosyoAI.png",
   },
   generator: "BPxAI",
 };
